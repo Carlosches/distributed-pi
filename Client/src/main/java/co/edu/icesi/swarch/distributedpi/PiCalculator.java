@@ -1,18 +1,18 @@
 package main.java.co.edu.icesi.swarch.distributedpi;
+
 import java.rmi.RemoteException;
 import java.util.Scanner;
-import main.java.co.edu.icesi.swarch.distributedpi.Generator;
 
 import org.osoa.sca.annotations.Reference;
 
 public class PiCalculator implements Runnable{
     
-    private Generator generator;
+    private Client_Broker_Service cb_Service;
 
     @Reference
-    public final void setGenerator(Generator generator)
+    public final void setGenerator(Client_Broker_Service cb_Service)
     {
-      this.generator = generator;
+      this.cb_Service = cb_Service;
     }
 
     
@@ -28,8 +28,8 @@ public class PiCalculator implements Runnable{
         int seed = sc.nextInt();
         long p = 0;
         try{
-            p=generator.generatePoints(points, seed);
-            //generator.getPointsInCircle();
+            p=cb_Service.generatePoints(points, seed);
+            //cb_Service.getPointsInCircle();
         }catch (RemoteException e){
             System.out.println("Lastimosament falló");
         }
