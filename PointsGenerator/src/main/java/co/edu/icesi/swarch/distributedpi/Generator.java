@@ -8,7 +8,7 @@ public interface Generator extends Remote{
 
     public long generatePoints(long points, int seed)throws RemoteException;
     public long getPointsInCircle()throws RemoteException;
-    long getState() throws RemoteException;
+    int getState() throws RemoteException;
     void setState(int state) throws RemoteException;
 
 }

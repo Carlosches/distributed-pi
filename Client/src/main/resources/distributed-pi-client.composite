@@ -14,8 +14,9 @@
       <interface.java interface="java.lang.Runnable" />
     </service>
 
-    <reference name="generator">
-      <frascati:binding.rmi host="localhost" serviceName="generatorService" port="2002"/>
+    <reference name="client_generator">
+      <frascati:binding.rmi host="localhost" serviceName="client_generatorService" port="2002"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Client_Broker_Service" />
     </reference>
 
     <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.PiCalculator"/>

@@ -5,24 +5,25 @@ import java.util.LinkedList;
 
 public class ProviderImp implements Attacher, Provider {
 
-    private static LinkedList<Generator> availableGenerators = new LinkedList<>();
-    private static LinkedList<Generator> unAvailableGenerators = new LinkedList<>();
+    private static LinkedList<Generator> availableGenerators = new LinkedList<Generator>();
+    private static LinkedList<Generator> unAvailableGenerators = new LinkedList<Generator>();
 
-    private static LinkedList<String> availableUris = new LinkedList<>();
+    private static LinkedList<String> availableUris = new LinkedList<String>();
 
     @Override
     public synchronized void attachGenerator(String uri) {
-        
+        System.out.println("FFFFFFFFFFFFFFFFFFFFFFF");
         try{
             
             Generator generator = (Generator)Naming.lookup(uri);
-            System.out.println("New generator connected : " + uri);
             availableGenerators.add(generator);
             availableUris.add(uri);
+            System.out.println("New generator connected: " + uri);
+            System.out.println("total generators: " + availableGenerators.size());
 
         }catch(Exception e){
             System.out.println("error al hacer binding: "+uri);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         
     }

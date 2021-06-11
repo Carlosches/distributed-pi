@@ -3,13 +3,15 @@ package main.java.co.edu.icesi.swarch.distributedpi;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-import org.osoa.sca.annotations.Reference;
+import org.osoa.sca.annotations.*;
 
+@Service(Runnable.class)
 public class PiCalculator implements Runnable{
     
+    @Reference(name = "client_generator")
     private Client_Broker_Service cb_Service;
 
-    @Reference
+    //@Reference
     public final void setGenerator(Client_Broker_Service cb_Service)
     {
       this.cb_Service = cb_Service;

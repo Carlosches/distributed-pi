@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0"
+  xmlns:frascati="http://frascati.ow2.org/xmlns/sca/1.1"
+  targetNamespace="http://frascati.ow2.org/distributed-pi"
+  name="broker">
+
+  <component name="broker">
+
+    <service name="client_generator">
+      <frascati:binding.rmi host="localhost" serviceName="client_generatorService" port="2002"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Client_Broker_Service" />
+    </service>
+    
+    <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.Broker" />
+
+  </component>
+
+  <component name="providerImp">
+
+    <service name="attacher">
+      <frascati:binding.rmi host="localhost" serviceName="attachService" port="2003"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Attacher" />
+    </service>
+
+    <service name="providerr">
+      <!-- <frascati:binding.rmi host="localhost" serviceName="providerService" port="2004"/> -->
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Provider" />
+    </service>
+    
+    <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.ProviderImp" />
+
+  </component>
+
+</composite>
