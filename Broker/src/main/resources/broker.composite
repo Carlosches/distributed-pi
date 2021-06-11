@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0"
+  xmlns:frascati="http://frascati.ow2.org/xmlns/sca/1.1"
+  targetNamespace="http://frascati.ow2.org/distributed-pi"
+  name="generator">
+
+  <component name="pointsGenerator">
+
+    <service name="generator">
+      <frascati:binding.rmi host="localhost" serviceName="generatorService" port="2002"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Generator" />
+    </service>
+    
+    <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.GeneratorImpl" />
+
+  </component>
+
+</composite>
