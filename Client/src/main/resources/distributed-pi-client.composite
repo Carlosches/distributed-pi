@@ -9,9 +9,16 @@
   </service>
 
   <component name="client">
+    
+    <property name="myUri">rmi://localhost:2009/client_notifierService</property>
 
     <service name="r">
       <interface.java interface="java.lang.Runnable" />
+    </service>
+
+    <service name="client_notifier">
+      <frascati:binding.rmi host="localhost" serviceName="client_notifierService" port="2009"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Client_notifier" />
     </service>
 
     <reference name="client_generator">
