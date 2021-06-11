@@ -1,12 +1,14 @@
 package main.java.co.edu.icesi.swarch.distributedpi;
 
 import java.rmi.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class ProviderImp implements Attacher, Provider {
 
-    private static ArrayList<Generator> availableGenerators = new ArrayList<>();
-    private static ArrayList<Generator> unAvailableGenerators = new ArrayList<>();
+    private static LinkedList<Generator> availableGenerators = new LinkedList<>();
+    private static LinkedList<Generator> unAvailableGenerators = new LinkedList<>();
+
+    private static LinkedList<String> availableUris = new LinkedList<>();
 
     @Override
     public synchronized void attachGenerator(String uri) {
@@ -16,6 +18,7 @@ public class ProviderImp implements Attacher, Provider {
             Generator generator = (Generator)Naming.lookup(uri);
             System.out.println("New generator connected : " + uri);
             availableGenerators.add(generator);
+            availableUris.add(uri);
 
         }catch(Exception e){
             System.out.println("error al hacer binding: "+uri);
@@ -26,20 +29,28 @@ public class ProviderImp implements Attacher, Provider {
 
     @Override
     public synchronized void detachGenerator(String uri) {
-        // TODO Auto-generated method stub
+        int index=availableUris.indexOf(uri);
+		String uriRemoved=availableUris.remove(index);
+		availableGenerators.remove(index);
+		assert(uri.equals(uriRemoved));	
         
     }
 
     @Override
     public Generator getGenerator() {
-        // TODO Auto-generated method stub
+        int size=availableGenerators.size();
+        if(size>0){
+            Generator ret=availableGenerators.poll();
+            availableUris.add(availableUris.poll());
+            availableGenerators.add(ret);
+            return ret;
+        }
         return null;
     }
 
     @Override
     public int generatorCount() {
-        // TODO Auto-generated method stub
-        return 0;
+        return availableGenerators.size();
     }
 
     
