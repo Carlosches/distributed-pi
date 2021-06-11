@@ -10,9 +10,10 @@ public class ProviderImp implements Attacher, Provider {
 
     private static LinkedList<String> availableUris = new LinkedList<String>();
 
+    
+
     @Override
     public synchronized void attachGenerator(String uri) {
-        System.out.println("FFFFFFFFFFFFFFFFFFFFFFF");
         try{
             
             Generator generator = (Generator)Naming.lookup(uri);

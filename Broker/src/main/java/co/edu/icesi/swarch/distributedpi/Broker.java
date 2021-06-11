@@ -11,6 +11,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
     @Reference(name="providerr")
     private Provider provider;
 
+    //@Reference
     public final void setProvider(Provider provider)
     {
       this.provider = provider;
@@ -22,6 +23,9 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
 
     @Override
     public long generatePoints(long points, int seed) throws RemoteException {
-        return 0;
+      
+      Generator g = provider.getGenerator();
+      
+      return g.generatePoints(points, seed);
     }
 }

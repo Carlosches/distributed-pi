@@ -31,4 +31,6 @@
 
   </component>
 
+  <wire source="broker/providerr" target="providerImp/providerr"/>
+
 </composite>
