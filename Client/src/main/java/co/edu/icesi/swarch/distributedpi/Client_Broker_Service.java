@@ -6,7 +6,7 @@ import org.osoa.sca.annotations.Service;
 @Service
 public interface Client_Broker_Service extends Remote{
 
-    long generatePoints(long points, int seed)throws RemoteException;
+    long generatePoints(long points, int seed, int nodes, long blockSize)throws RemoteException;
     void setNotifier(String uri) throws RemoteException;
 
 }
