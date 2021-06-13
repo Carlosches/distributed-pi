@@ -32,19 +32,27 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
         System.out.println("server created");
     }
     
+<<<<<<< HEAD
     public long generatePoints(long points, int seed){
         state = WORKING;
+=======
+    public long generatePoints(long points, int seed, double min, double max){
+>>>>>>> 904f97af24a5b1ce77ccb7cbb49e38af2a9c83b2
         Random random = new Random(seed);
         long pointsInCircle2 = 0;           // LOOK AT THIS LATER
         for(long i=0; i<points; i++){
-            double x = random.nextDouble();
-            double y = random.nextDouble();
+            double x = min + ( max - min ) * random.nextDouble();
+            double y = min + ( max - min ) * random.nextDouble();
             //System.out.println("x: " + x + "  y: "+ y);
             if(x*x+y*y<=1){
                 pointsInCircle2++;
             }
         }
+<<<<<<< HEAD
         state = FREE;
+=======
+        System.out.println("points in circle: "+pointsInCircle2);
+>>>>>>> 904f97af24a5b1ce77ccb7cbb49e38af2a9c83b2
         return pointsInCircle2;
     }
     public long getPointsInCircle(){

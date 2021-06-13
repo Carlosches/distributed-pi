@@ -11,6 +11,8 @@ public class PiCalculator implements Client_notifier, Runnable {
   @Property
   private String myUri;
 
+  private long blockSize;
+
   @Reference(name = "client_generator")
   private Client_Broker_Service cb_Service;
 
@@ -21,6 +23,7 @@ public class PiCalculator implements Client_notifier, Runnable {
 
   public PiCalculator() {
     System.out.println("CLIENT created");
+    blockSize=10000000;
   }
 
   public final void run() {
@@ -44,10 +47,14 @@ public class PiCalculator implements Client_notifier, Runnable {
     Scanner sc = new Scanner(System.in);
     long points = sc.nextLong();
     int seed = sc.nextInt();
+    int nodes = sc.nextInt();
+
     long p = 0;
-    
+    if(points<100000000){
+      blockSize = 100000;
+    }
     try {
-      p = cb_Service.generatePoints(points, seed);
+      p = cb_Service.generatePoints(points, seed, nodes, blockSize);
       // cb_Service.getPointsInCircle();
     } catch (RemoteException e) {
       System.out.println("Lastimosament falló");
