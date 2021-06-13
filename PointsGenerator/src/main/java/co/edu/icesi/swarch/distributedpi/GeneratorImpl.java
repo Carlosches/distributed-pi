@@ -9,10 +9,8 @@ import org.osoa.sca.annotations.*;
 @Scope("CONVERSATION")
 public class GeneratorImpl extends UnicastRemoteObject implements Generator, Runnable{
 
-    public final static int EMPTY=1;
-	public final static int SORTING=2;
-	public final static int FREE=3;
-	public final static int BIG=100;
+    public final static int FREE=0;
+    public final static int WORKING=1;
 	
 	private int state;
 
@@ -30,11 +28,12 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
 
     public GeneratorImpl() throws RemoteException {
         pointsInCircle=0;
-        state = EMPTY;
+        state = FREE;
         System.out.println("server created");
     }
     
     public long generatePoints(long points, int seed){
+        state = WORKING;
         Random random = new Random(seed);
         long pointsInCircle2 = 0;           // LOOK AT THIS LATER
         for(long i=0; i<points; i++){
@@ -45,6 +44,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
                 pointsInCircle2++;
             }
         }
+        state = FREE;
         return pointsInCircle2;
     }
     public long getPointsInCircle(){
