@@ -57,7 +57,6 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
       double min = 0.0;
       double max = regionSize;
       
-      Random r = new Random(seed);
 
       for(int i=0;i<nodes;i++){
         Generator gen = availableGenerators.poll();
