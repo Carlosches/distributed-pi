@@ -7,5 +7,5 @@ public interface Attacher{
 
     void attachGenerator(String uri);
     void detachGenerator(String uri);
-
+    
 }

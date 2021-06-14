@@ -23,9 +23,10 @@ public class PiCalculator implements Client_notifier, Runnable {
 
   public PiCalculator() {
     System.out.println("CLIENT created");
-    blockSize=10000000;
+    blockSize = 10000000;
   }
 
+  @Override
   public final void run() {
 
     System.out.println("Setting observer...");
@@ -45,30 +46,36 @@ public class PiCalculator implements Client_notifier, Runnable {
     System.out.println("Started");
 
     Scanner sc = new Scanner(System.in);
-    long points = sc.nextLong();
-    int seed = sc.nextInt();
-    int nodes = sc.nextInt();
+    int cont = sc.nextInt();
+    while(cont != 0){
 
-    long p = 0;
-    if(points<100000000){
-      blockSize = 100000;
+      long points = sc.nextLong();
+      int seed = sc.nextInt();
+      int nodes = sc.nextInt();
+
+      long p = 0;
+      if(points<100000000){
+        blockSize = 100000;
+      }
+      try {
+        p = cb_Service.generatePoints(points, seed, nodes, blockSize);
+        // cb_Service.getPointsInCircle();
+      } catch (RemoteException e) {
+        System.out.println("Lastimosament falló");
+      }
+
+      double pi = 4 * ((double) p / points);
+      System.out.println("Points in circle: " + p);
+      System.out.println("Pi " + pi);
+      cont = sc.nextInt();
     }
-    try {
-      p = cb_Service.generatePoints(points, seed, nodes, blockSize);
-      // cb_Service.getPointsInCircle();
-    } catch (RemoteException e) {
-      System.out.println("Lastimosament falló");
-    }
 
-    double pi = 4 * ((double) p / points);
-    System.out.println("Points in circle: " + p);
-    System.out.println("Pi " + pi);
-
+    System.exit(0);
   }
 
   @Override
-  public void notifyClient(long points) throws RemoteException{
-
+  public void notifyClient(long points) throws RemoteException {
+    
   }
 
 }

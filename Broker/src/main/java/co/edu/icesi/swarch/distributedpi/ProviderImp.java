@@ -58,5 +58,6 @@ public class ProviderImp implements Attacher, Provider {
     public LinkedList<Generator> getAvailableGenerators(){
         return availableGenerators;
     }
+
     
 }

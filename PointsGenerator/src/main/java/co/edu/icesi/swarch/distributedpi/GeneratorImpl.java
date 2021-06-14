@@ -33,7 +33,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     }
     
     public long generatePoints(long points, int seed, double min, double max){
-       // System.out.println("points: " + points + " min: " +min+ " max: " +max);
+        System.out.println("fui llamado1");
         Random random = new Random(seed);
         long pointsInCircle2 = 0;           // LOOK AT THIS LATER
         for(long i=0; i<points; i++){
