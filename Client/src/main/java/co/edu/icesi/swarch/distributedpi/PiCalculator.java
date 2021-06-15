@@ -57,16 +57,23 @@ public class PiCalculator implements Client_notifier, Runnable {
       if(points<100000000){
         blockSize = 100000;
       }
+
+      long antes = 0;
+      long despues = 0;
+
       try {
+        antes = System.currentTimeMillis();
         p = cb_Service.generatePoints(points, seed, nodes, blockSize);
+        despues = System.currentTimeMillis();
         // cb_Service.getPointsInCircle();
       } catch (RemoteException e) {
         System.out.println("Lastimosament falló");
       }
-
+      long totaltime = (despues-antes)/1000;
       double pi = 4 * ((double) p / points);
       System.out.println("Points in circle: " + p);
       System.out.println("Pi " + pi);
+      System.out.println("time: " + totaltime);
       cont = sc.nextInt();
     }
 
