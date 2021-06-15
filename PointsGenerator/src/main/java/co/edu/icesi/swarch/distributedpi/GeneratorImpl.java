@@ -11,7 +11,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
 
     public final static int FREE=0;
     public final static int WORKING=1;
-	
+
 	private int state;
 
     private long pointsInCircle;
@@ -20,6 +20,9 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     private String myUri;
     
     private Attacher attacher;
+
+    private BrokerNotifier brokerNotifier;
+    private long totalPoints;
 
     @Reference(name="attacher")
 	public void setSubject(Attacher att) {
@@ -32,25 +35,24 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
         System.out.println("server created");
     }
     
-    public long generatePoints(long points, int seed, double min, double max){
+    public void generatePoints(long points, int seed, double min, double max) throws RemoteException{
         //System.out.println("fui llamado1");
+        this.totalPoints=points;
         Random random = new Random(seed);
-        long pointsInCircle2 = 0;           // LOOK AT THIS LATER
+        this.pointsInCircle=0;
         for(long i=0; i<points; i++){
             double x = min + ( max - min ) * random.nextDouble();
             double y = random.nextDouble();
             //System.out.println("x: " + x + "  y: "+ y);
             if(x*x+y*y<=1){
-                pointsInCircle2++;
+                this.pointsInCircle++;
             }
             
         }
        // System.out.println("points in circle: "+pointsInCircle2);
-        return pointsInCircle2;
+       brokerNotifier.notify(this);
     }
-    public long getPointsInCircle(){
-        return pointsInCircle;
-    }
+    
 
     @Override
     public void run(){
@@ -68,5 +70,17 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     public void setState(int state) throws RemoteException {
         this.state = state;
     }
-    
+
+    @Override
+    public void setBrokerNotifier(BrokerNotifier brokerNotifier){
+        this.brokerNotifier = brokerNotifier;
+    }
+    @Override
+    public long getPointsInCircle() throws RemoteException{
+        return this.pointsInCircle;
+    }
+    @Override
+    public long getTotalPoints() throws RemoteException{
+        return this.totalPoints;
+    } 
 }

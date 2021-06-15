@@ -16,13 +16,19 @@ import java.math.*;
 import java.util.concurrent.*;
 
 //@Service(Runnable.class)
-public class Broker extends UnicastRemoteObject implements Client_Broker_Service{
+public class Broker extends UnicastRemoteObject implements Client_Broker_Service, BrokerNotifier{
 
   private Client_notifier cNotifier;
   private static Semaphore semaphore = new Semaphore(1);
   private LinkedList<Generator> availableGenerators;
   private LinkedList<Integer> states;
-
+  private long totalPoints;
+  private long pointsInCircle;
+  private double min;
+  private double max;
+  private double regionSize;
+  private long blockSize;
+  private int seed;
   @Reference(name = "providerr")
   private Provider provider;
 
@@ -37,27 +43,32 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   }
 
   @Override
-  public long generatePoints(long points, int seed, int nodes, long blockSize) throws RemoteException {
-    availableGenerators = new LinkedList<Generator>();
-    states = new LinkedList<Integer>();
+  public void generatePoints(long points, int seed, int nodes, long blSize) throws RemoteException {
+    //availableGenerators = new LinkedList<Generator>();
+    //states = new LinkedList<Integer>();
+    this.totalPoints = points;
+    this.blockSize = blSize;
+    this.seed = seed;
+    int threads = (int) Math.ceil(points/ (blockSize*nodes*1.0));
+    regionSize = (1.0/(nodes*threads*1.0));
+    min = 0.0;
+    max = regionSize;
 
     for(int i=0; i<nodes ;i++){
-       availableGenerators.add(provider.getGenerator());
-       states.add(GeneratorImpl.FREE);
+       Generator gen = provider.getGenerator();
+       gen.setBrokerNotifier(this);
+       callGenerator(gen, blockSize);
+       min = max;
+       max+=regionSize;
     }
    
-    int threads = (int) Math.ceil(points/ (blockSize*nodes*1.0));
     
-    long totalPoints=0;
-    double regionSize = (1.0/(nodes*threads*1.0));
    
-    ArrayList<Wrap> wraps = new ArrayList<Wrap>();
-    ExecutorService executor = Executors.newFixedThreadPool(threads);
+    //ArrayList<Wrap> wraps = new ArrayList<Wrap>();
+    //ExecutorService executor = Executors.newFixedThreadPool(threads);
 
-    double min = 0.0;
-    double max = regionSize;
 
-    while(threads-->0){
+   /* while(threads-->0){
       
       for(int i=0;i<nodes;i++){
         Generator gen = availableGenerators.poll();
@@ -84,18 +95,44 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
 
     for(Wrap wr: wraps){
       totalPoints+=wr.getPointsResult();
-    }
+    }*/
+  }
+  public void callGenerator(Generator generator, long points){
+    Wrap w = new Wrap(generator, seed, points, min,max);
+    new Thread(w).start(); 
     
-    return totalPoints;  // retorna el total de puntos
   }
 
   @Override
   public void setNotifier(String uri) throws RemoteException{
-    
+    System.out.println("set notifier called");
     try {
       cNotifier = (Client_notifier) Naming.lookup(uri);
+      if(cNotifier==null)
+        System.out.println("Client notifier es null");
     } catch (Exception e) {
       System.out.println("ERROR IN BROKER SETNOTIFIER");
     }  
+  }
+
+  @Override
+  public synchronized void notify(Generator generator) throws RemoteException {
+    try{
+        semaphore.acquire();
+        totalPoints-=generator.getTotalPoints();
+        pointsInCircle+=generator.getPointsInCircle();
+        if(totalPoints>0){
+          min = max;
+          max+=regionSize;
+          callGenerator(generator, this.blockSize);
+          
+        }
+      else{
+        cNotifier.notifyClient(this.pointsInCircle);
+      }
+      semaphore.release();
+    }catch(InterruptedException e){
+      e.printStackTrace();
+    }
   }
 }

@@ -12,6 +12,9 @@ public class PiCalculator implements Client_notifier, Runnable {
   private String myUri;
 
   private long blockSize;
+  private long totalPoints;
+  private int seed;
+  private int nodes;
 
   @Reference(name = "client_generator")
   private Client_Broker_Service cb_Service;
@@ -49,24 +52,27 @@ public class PiCalculator implements Client_notifier, Runnable {
     int cont = sc.nextInt();
     while(cont != 0){
 
-      long points = sc.nextLong();
-      int seed = sc.nextInt();
-      int nodes = sc.nextInt();
+      totalPoints = sc.nextLong();
+      seed = sc.nextInt();
+      nodes = sc.nextInt();
 
       long p = 0;
-      if(points<100000000){
+      if(totalPoints<100000000){
         blockSize = 100000;
       }
-      try {
-        p = cb_Service.generatePoints(points, seed, nodes, blockSize);
+     
+        new Thread(new Runnable(){
+          public void run(){
+            try{
+              cb_Service.generatePoints(totalPoints, seed, nodes, blockSize);
+            }catch(RemoteException e){
+              System.out.println("Lastimosament falló");
+            }
+          }
+        }).start();
+        System.out.println("El hilo se mandó del cliente al broker");
         // cb_Service.getPointsInCircle();
-      } catch (RemoteException e) {
-        System.out.println("Lastimosament falló");
-      }
-
-      double pi = 4 * ((double) p / points);
-      System.out.println("Points in circle: " + p);
-      System.out.println("Pi " + pi);
+     
       cont = sc.nextInt();
     }
 
@@ -74,8 +80,10 @@ public class PiCalculator implements Client_notifier, Runnable {
   }
 
   @Override
-  public void notifyClient(long points) throws RemoteException {
-    
+  public void notifyClient(long pointsInCircle) throws RemoteException {
+     double pi = 4 * ((double) pointsInCircle / totalPoints);
+     System.out.println("Points in circle: " + pointsInCircle);
+     System.out.println("Pi " + pi);
   }
 
 }

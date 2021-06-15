@@ -6,9 +6,11 @@ import org.osoa.sca.annotations.Service;
 @Service
 public interface Generator extends Remote{
 
-    public long generatePoints(long points, int seed, double min, double max)throws RemoteException;
+    public void generatePoints(long points, int seed, double min, double max)throws RemoteException;
     public long getPointsInCircle()throws RemoteException;
     int getState() throws RemoteException;
     void setState(int state) throws RemoteException;
+    public void setBrokerNotifier(BrokerNotifier brokerNotifier) throws RemoteException;
+    public long getTotalPoints()throws RemoteException;
 
 }
