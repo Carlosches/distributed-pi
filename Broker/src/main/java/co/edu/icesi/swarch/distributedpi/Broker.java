@@ -51,7 +51,9 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
     this.blockSize = blSize;
     this.seed = seed;
     int threads = (int) Math.ceil(points / (blockSize * nodes * 1.0));
+    System.out.println("threads: " + threads); 
     regionSize = (1.0 / (nodes * threads * 1.0));
+    System.out.println("region: " + regionSize);
     min = 0.0;
     max = regionSize;
 
@@ -61,6 +63,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
       callGenerator(gen, blockSize);
       min = max;
       max += regionSize;
+      System.out.println("max: " + max);
     }
 
   }
@@ -93,10 +96,12 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
         System.out.println(totalPoints);
         pointsInCircle += generator.getPointsInCircle();
         System.out.println(pointsInCircle);
+        System.out.println("max: " + max);
         if (totalPoints > 0) {
+          callGenerator(generator, this.blockSize);
           min = max;
           max += regionSize;
-          callGenerator(generator, this.blockSize);
+          
         } else {
           cNotifier.notifyClient(this.pointsInCircle);
         }
@@ -104,6 +109,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
       } catch (Exception e) {
         System.out.println("Errorrrrrrr");
       }
+      
       System.out.println();
     }
   }
