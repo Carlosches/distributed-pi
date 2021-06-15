@@ -47,13 +47,13 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   public void generatePoints(long points, int seed, int nodes, long blSize) throws RemoteException {
 
     this.totalPoints = points;
-    System.out.println("total points: " + totalPoints);
+    //System.out.println("total points: " + totalPoints);
     this.blockSize = blSize;
     this.seed = seed;
     int threads = (int) Math.ceil(points / (blockSize * nodes * 1.0));
     System.out.println("threads: " + threads); 
     regionSize = (1.0 / (nodes * threads * 1.0));
-    System.out.println("region: " + regionSize);
+    //System.out.println("region: " + regionSize);
     min = 0.0;
     max = regionSize;
 
@@ -63,7 +63,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
       callGenerator(gen, blockSize);
       min = max;
       max += regionSize;
-      System.out.println("max: " + max);
+      //System.out.println("max: " + max);
     }
 
   }
@@ -89,14 +89,14 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   public synchronized void notify(Generator generator) throws RemoteException {
     if (totalPoints > 0) { // macheteeeee XD
 
-      System.out.println(generator.getUri());
+      //System.out.println(generator.getUri());
       try {
         semaphore.acquire();
         totalPoints -= generator.getTotalPoints();
-        System.out.println(totalPoints);
+        //System.out.println(totalPoints);
         pointsInCircle += generator.getPointsInCircle();
-        System.out.println(pointsInCircle);
-        System.out.println("max: " + max);
+        //System.out.println(pointsInCircle);
+        //System.out.println("max: " + max);
         if (totalPoints > 0) {
           callGenerator(generator, this.blockSize);
           min = max;
