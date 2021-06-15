@@ -1,5 +1,6 @@
 package main.java.co.edu.icesi.swarch.distributedpi;
 
+import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
@@ -36,7 +37,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     }
     
     public void generatePoints(long points, int seed, double min, double max) throws RemoteException{
-        //System.out.println("fui llamado1");
+        System.out.println("Working");
         this.totalPoints=points;
         Random random = new Random(seed);
         this.pointsInCircle=0;
@@ -51,7 +52,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
         }
        
        brokerNotifier.notify(this);
-       //System.out.println("termine en generator");
+       System.out.println("Free");
     }
     
 
@@ -84,4 +85,9 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     public long getTotalPoints() throws RemoteException{
         return this.totalPoints;
     } 
+
+    @Override
+    public String getUri() throws RemoteException{
+        return myUri;
+    }
 }

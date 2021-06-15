@@ -12,5 +12,5 @@ public interface Generator extends Remote{
     void setState(int state) throws RemoteException;
     public void setBrokerNotifier(BrokerNotifier brokerNotifier) throws RemoteException;
     public long getTotalPoints()throws RemoteException;
-
+    String getUri() throws RemoteException;
 }

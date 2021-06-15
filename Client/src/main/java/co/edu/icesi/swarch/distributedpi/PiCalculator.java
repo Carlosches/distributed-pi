@@ -81,8 +81,9 @@ public class PiCalculator implements Client_notifier, Runnable {
 
   @Override
   public void notifyClient(long pointsInCircle) throws RemoteException {
-     double pi = 4 * ((double) pointsInCircle / totalPoints);
-     System.out.println("Pi " + pi);
+    System.out.println("points in circle: " + pointsInCircle); 
+    double pi = 4 * ((double) pointsInCircle / totalPoints);
+    System.out.println("Pi " + pi);
   }
 
   @Override
