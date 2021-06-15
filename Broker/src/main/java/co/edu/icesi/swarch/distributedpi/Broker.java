@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 //@Service(Runnable.class)
 public class Broker extends UnicastRemoteObject implements Client_Broker_Service, BrokerNotifier{
 
-  private Client_notifier cNotifier;
+  private static Client_notifier cNotifier;
   private static Semaphore semaphore = new Semaphore(1);
   private LinkedList<Generator> availableGenerators;
   private LinkedList<Integer> states;
@@ -29,6 +29,9 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   private double regionSize;
   private long blockSize;
   private int seed;
+
+  private String uriClient;
+
   @Reference(name = "providerr")
   private Provider provider;
 
@@ -44,9 +47,9 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
 
   @Override
   public void generatePoints(long points, int seed, int nodes, long blSize) throws RemoteException {
-    //availableGenerators = new LinkedList<Generator>();
-    //states = new LinkedList<Integer>();
+  
     this.totalPoints = points;
+    System.out.println("total points: " + totalPoints);
     this.blockSize = blSize;
     this.seed = seed;
     int threads = (int) Math.ceil(points/ (blockSize*nodes*1.0));
@@ -62,41 +65,8 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
        max+=regionSize;
     }
    
-    
-   
-    //ArrayList<Wrap> wraps = new ArrayList<Wrap>();
-    //ExecutorService executor = Executors.newFixedThreadPool(threads);
-
-
-   /* while(threads-->0){
-      
-      for(int i=0;i<nodes;i++){
-        Generator gen = availableGenerators.poll();
-        availableGenerators.add(gen);
-        Wrap w = new Wrap(gen, points, seed, blockSize, min,max);
-        try {
-          semaphore.acquire();
-          wraps.add(w);
-          semaphore.release();
-        } catch (Exception e) {
-          System.out.println("Error with semaphore");
-        }
-        
-        executor.execute(w);
-        min=max;
-        max+=regionSize;
-      }
-      
-    }
-    executor.shutdown();
-    while(!executor.isTerminated());
-
-    System.out.println("tamaño de wrapper: " + wraps.size());
-
-    for(Wrap wr: wraps){
-      totalPoints+=wr.getPointsResult();
-    }*/
   }
+
   public void callGenerator(Generator generator, long points){
     Wrap w = new Wrap(generator, seed, points, min,max);
     new Thread(w).start(); 
@@ -106,33 +76,43 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   @Override
   public void setNotifier(String uri) throws RemoteException{
     System.out.println("set notifier called");
+    this.uriClient = uri;
     try {
       cNotifier = (Client_notifier) Naming.lookup(uri);
       if(cNotifier==null)
         System.out.println("Client notifier es null");
     } catch (Exception e) {
       System.out.println("ERROR IN BROKER SETNOTIFIER");
-    }  
+    }
+    System.out.println(cNotifier.getUri()); 
+    
   }
 
   @Override
-  public synchronized void notify(Generator generator) throws RemoteException {
+  public void notify(Generator generator) throws RemoteException { 
+    System.out.println(cNotifier.getUri());
     try{
+        System.out.println("holaaaaa");
+        //cNotifier = (Client_notifier) Naming.lookup(uriClient);
+        
         semaphore.acquire();
         totalPoints-=generator.getTotalPoints();
+        System.out.println(totalPoints);
         pointsInCircle+=generator.getPointsInCircle();
+        System.out.println(pointsInCircle);
         if(totalPoints>0){
           min = max;
           max+=regionSize;
           callGenerator(generator, this.blockSize);
-          
+          System.out.println("llegue");
+          //cNotifier.notifyClient(pointsInCircle);
+        }else {
+          cNotifier.notifyClient(this.pointsInCircle);
+          System.out.println(generator.toString() + "pase else");
         }
-      else{
-        cNotifier.notifyClient(this.pointsInCircle);
-      }
-      semaphore.release();
-    }catch(InterruptedException e){
-      e.printStackTrace();
+        semaphore.release();
+    }catch(Exception e){
+      System.out.println("Errorrrrrrr");
     }
   }
 }

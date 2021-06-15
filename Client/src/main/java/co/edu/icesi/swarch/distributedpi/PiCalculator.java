@@ -12,7 +12,7 @@ public class PiCalculator implements Client_notifier, Runnable {
   private String myUri;
 
   private long blockSize;
-  private long totalPoints;
+  private static long totalPoints;
   private int seed;
   private int nodes;
 
@@ -70,7 +70,7 @@ public class PiCalculator implements Client_notifier, Runnable {
             }
           }
         }).start();
-        System.out.println("El hilo se mandó del cliente al broker");
+        System.out.println("El hilo se mando del cliente al broker");
         // cb_Service.getPointsInCircle();
      
       cont = sc.nextInt();
@@ -82,8 +82,12 @@ public class PiCalculator implements Client_notifier, Runnable {
   @Override
   public void notifyClient(long pointsInCircle) throws RemoteException {
      double pi = 4 * ((double) pointsInCircle / totalPoints);
-     System.out.println("Points in circle: " + pointsInCircle);
      System.out.println("Pi " + pi);
+  }
+
+  @Override
+  public String getUri() throws RemoteException{
+    return myUri;
   }
 
 }

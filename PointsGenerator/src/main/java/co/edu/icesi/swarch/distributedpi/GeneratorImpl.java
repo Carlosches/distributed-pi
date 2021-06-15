@@ -49,8 +49,9 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
             }
             
         }
-       // System.out.println("points in circle: "+pointsInCircle2);
+       
        brokerNotifier.notify(this);
+       //System.out.println("termine en generator");
     }
     
 

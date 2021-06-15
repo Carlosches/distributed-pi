@@ -21,6 +21,7 @@ public class Wrap implements Runnable{
     public void run() {
         try{
             generator.generatePoints(blockSize, seed, min,max);
+            //System.out.println("termine en wrap");
           //  System.out.println("Wrap points Result: " + pointsResult);
         }catch(RemoteException e){
             System.out.println("no se generaron los puntos");
