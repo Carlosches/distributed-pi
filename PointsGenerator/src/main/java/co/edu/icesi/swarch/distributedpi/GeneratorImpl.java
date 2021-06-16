@@ -37,7 +37,7 @@ public class GeneratorImpl extends UnicastRemoteObject implements Generator, Run
     }
     
     public void generatePoints(long points, int seed, double min, double max) throws RemoteException{
-        //System.out.println("Working");
+       // System.out.println("min: "+min +" max: "+ max);
         this.totalPoints=points;
         Random random = new Random(seed);
         this.pointsInCircle=0;

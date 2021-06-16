@@ -2,8 +2,11 @@ package main.java.co.edu.icesi.swarch.distributedpi;
 
 import java.rmi.RemoteException;
 import java.util.Scanner;
-
 import org.osoa.sca.annotations.*;
+import javax.swing.JFrame;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @Service(Runnable.class)
 public class PiCalculator implements Client_notifier, Runnable {
@@ -15,6 +18,10 @@ public class PiCalculator implements Client_notifier, Runnable {
   private static long totalPoints;
   private int seed;
   private int nodes;
+  private static ClientInterface clientInterface;
+  private static long beforeExecution;
+  private static long afterExecution;
+  
 
   @Reference(name = "client_generator")
   private Client_Broker_Service cb_Service;
@@ -33,61 +40,62 @@ public class PiCalculator implements Client_notifier, Runnable {
   public final void run() {
 
     System.out.println("Setting observer...");
-    
+    clientInterface = new ClientInterface();
+    clientInterface.setLocationRelativeTo(null);
+    clientInterface.setVisible(true);
+
     try {
-    
+
       cb_Service.setNotifier(myUri);
-      Thread.sleep(1000);
+      Thread.sleep(500);
 
     } catch (Exception e) {
-      
+
       System.out.println("Error while setting observer!");
 
     }
 
     System.out.println("Observer ready!");
     System.out.println("Started");
+    events();
 
-    Scanner sc = new Scanner(System.in);
-    int cont = sc.nextInt();
-    while(cont != 0){
+  }
 
-      totalPoints = sc.nextLong();
-      seed = sc.nextInt();
-      nodes = sc.nextInt();
+  public void events() {
+    clientInterface.getCalculateBtn().addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        totalPoints = Long.parseLong(clientInterface.getPointsTF().getText());
+        seed = Integer.parseInt(clientInterface.getSeedTF().getText());
+        nodes = Integer.parseInt(clientInterface.getNodesTf().getText());
 
-      long p = 0;
-      if(totalPoints<100000000){
-        blockSize = 100000;
-      }
-     
-        new Thread(new Runnable(){
-          public void run(){
-            try{
+        if (totalPoints < 100000000) {
+          blockSize = 100000;
+        }
+        new Thread(new Runnable() {
+          public void run() {
+            try {
+              beforeExecution = System.currentTimeMillis();
               cb_Service.generatePoints(totalPoints, seed, nodes, blockSize);
-            }catch(RemoteException e){
-              System.out.println("Lastimosament falló");
+            } catch (RemoteException e) {
+              System.out.println("Falló el llamado cliente-broker");
             }
           }
         }).start();
-        System.out.println("El hilo se mando del cliente al broker");
-        // cb_Service.getPointsInCircle();
-     
-      cont = sc.nextInt();
-    }
-
-    System.exit(0);
+      }
+    });
   }
 
   @Override
   public void notifyClient(long pointsInCircle) throws RemoteException {
-    System.out.println("points in circle: " + pointsInCircle); 
+    afterExecution = System.currentTimeMillis();
     double pi = 4 * ((double) pointsInCircle / totalPoints);
-    System.out.println("Pi " + pi);
+    clientInterface.getPiTF().setText(""+pi);
+    long diff = (afterExecution-beforeExecution)/1000;
+    clientInterface.getTimeTF().setText(""+diff);
   }
 
   @Override
-  public String getUri() throws RemoteException{
+  public String getUri() throws RemoteException {
     return myUri;
   }
 
