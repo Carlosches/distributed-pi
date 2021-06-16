@@ -56,9 +56,9 @@ public class PiCalculator implements Client_notifier, Runnable {
 
     System.out.println("Observer ready!");
     System.out.println("Started");
-    events();
-     
-    
+
+    events();     
+
    
   }
   public void events() {
