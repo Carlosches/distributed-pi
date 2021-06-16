@@ -7,5 +7,4 @@ import org.osoa.sca.annotations.Service;
 public interface Client_notifier extends Remote {
     
     void notifyClient(long points) throws RemoteException;
-
 }

@@ -4,6 +4,10 @@ import java.rmi.RemoteException;
 import java.util.Scanner;
 
 import org.osoa.sca.annotations.*;
+import javax.swing.JFrame;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @Service(Runnable.class)
 public class PiCalculator implements Client_notifier, Runnable {
@@ -12,6 +16,12 @@ public class PiCalculator implements Client_notifier, Runnable {
   private String myUri;
 
   private long blockSize;
+  private static long totalPoints;
+  private int seed;
+  private int nodes;
+  private static ClientInterface clientInterface;
+  private static long beforeExecution;
+  private static long afterExecution;
 
   @Reference(name = "client_generator")
   private Client_Broker_Service cb_Service;
@@ -30,7 +40,9 @@ public class PiCalculator implements Client_notifier, Runnable {
   public final void run() {
 
     System.out.println("Setting observer...");
-    
+    clientInterface = new ClientInterface();
+    clientInterface.setLocationRelativeTo(null);
+    clientInterface.setVisible(true);
     try {
     
       cb_Service.setNotifier(myUri);
@@ -44,33 +56,42 @@ public class PiCalculator implements Client_notifier, Runnable {
 
     System.out.println("Observer ready!");
     System.out.println("Started");
+    events();
+     
+    
+   
+  }
+  public void events() {
+    clientInterface.getCalculateBtn().addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        totalPoints = Long.parseLong(clientInterface.getPointsTF().getText());
+        seed = Integer.parseInt(clientInterface.getSeedTF().getText());
+        nodes = Integer.parseInt(clientInterface.getNodesTf().getText());
 
-    Scanner sc = new Scanner(System.in);
-    int cont = sc.nextInt();
-    while(cont != 0){
-
-      long points = sc.nextLong();
-      int seed = sc.nextInt();
-      int nodes = sc.nextInt();
-
-      long p = 0;
-      if(points<100000000){
-        blockSize = 100000;
+        if (totalPoints < 100000000) {
+          blockSize = 100000;
+        }
+        new Thread(new Runnable() {
+          public void run() {
+            try {
+              beforeExecution = System.currentTimeMillis();
+              long p = cb_Service.generatePoints(totalPoints, seed, nodes, blockSize);
+              calculatePi(p);
+            } catch (RemoteException e) {
+              System.out.println("Falló el llamado cliente-broker");
+            }
+          }
+        }).start();
       }
-      try {
-        p = cb_Service.generatePoints(points, seed, nodes, blockSize);
-        // cb_Service.getPointsInCircle();
-      } catch (RemoteException e) {
-        System.out.println("Lastimosament falló");
-      }
+    });
+  }
 
-      double pi = 4 * ((double) p / points);
-      System.out.println("Points in circle: " + p);
-      System.out.println("Pi " + pi);
-      cont = sc.nextInt();
-    }
-
-    System.exit(0);
+  public void calculatePi(long pointsInCircle){
+    afterExecution = System.currentTimeMillis();
+    double pi = 4 * ((double) pointsInCircle / totalPoints);
+    clientInterface.getPiTF().setText(""+pi);
+    long diff = (afterExecution-beforeExecution)/1000;
+    clientInterface.getTimeTF().setText(""+diff);
   }
 
   @Override
