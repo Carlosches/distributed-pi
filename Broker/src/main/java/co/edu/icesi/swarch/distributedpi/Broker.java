@@ -96,7 +96,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
         totalPoints -= generator.getTotalPoints();
         //System.out.println(totalPoints);
         pointsInCircle += generator.getPointsInCircle();
-        semaphore.release();
+        
         //System.out.println(pointsInCircle);
         //System.out.println("max: " + max);
         if (totalPoints > 0) {
@@ -107,7 +107,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
         } else {
           cNotifier.notifyClient(this.pointsInCircle);
         }
-        
+        semaphore.release();
       } catch (Exception e) {
         e.printStackTrace();
         System.out.println("Errorrrrrrr");
