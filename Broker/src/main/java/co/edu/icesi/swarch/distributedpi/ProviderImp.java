@@ -6,7 +6,6 @@ import java.util.LinkedList;
 public class ProviderImp implements Attacher, Provider {
 
     private static LinkedList<Generator> availableGenerators = new LinkedList<Generator>();
-    //private static LinkedList<Generator> unAvailableGenerators = new LinkedList<Generator>();
 
     private static LinkedList<String> availableUris = new LinkedList<String>();
 

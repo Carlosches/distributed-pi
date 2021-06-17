@@ -6,5 +6,6 @@ import java.rmi.RemoteException;
 public interface BrokerNotifier extends Remote {
 
     public void notify(Generator generator) throws RemoteException;
+    public int getState() throws RemoteException;
     
 }

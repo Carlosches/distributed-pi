@@ -6,6 +6,13 @@
 
   <component name="broker">
 
+    <property name="brokerUri">rmi://localhost:2014/client_notifierService</property>
+
+    <service name="broker_notifier">
+      <frascati:binding.rmi host="localhost" serviceName="broker_notifierService" port="2014"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.BrokerNotifier" />
+    </service>
+
     <service name="client_generator">
       <frascati:binding.rmi host="localhost" serviceName="client_generatorService" port="2002"/>
       <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Client_Broker_Service" />

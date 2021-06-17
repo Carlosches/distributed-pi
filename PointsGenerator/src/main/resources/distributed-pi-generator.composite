@@ -25,6 +25,11 @@
       <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Attacher" />
       <frascati:binding.rmi host="localhost" serviceName="attachService" port="2003"/>
     </reference>
+
+    <reference name="broker_notifier">
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.BrokerNotifier" />
+      <frascati:binding.rmi host="localhost" serviceName="broker_notifierService" port="2014"/>
+    </reference>
     
     <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.GeneratorImpl" />
 

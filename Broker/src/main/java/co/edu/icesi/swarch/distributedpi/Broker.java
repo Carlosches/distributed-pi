@@ -15,30 +15,31 @@ import java.math.*;
 
 import java.util.concurrent.*;
 
-//@Service(Runnable.class)
 public class Broker extends UnicastRemoteObject implements Client_Broker_Service, BrokerNotifier {
 
   private static Client_notifier cNotifier;
   private static Semaphore semaphore = new Semaphore(1);
   private LinkedList<Generator> availableGenerators;
-  private LinkedList<Integer> states;
-  private long totalPoints;
-  private long pointsInCircle;
-  private double min;
-  private double max;
+  private static long totalPoints;
+  private static long pointsInCircle;
   private double regionSize;
-  private long blockSize;
-  private int seed;
+  private static long blockSize;
+  private static Random seedGenerator;
+
+  private static int state;
+  public final static int WORKING = 1;
+  public final static int FREE = 0;
+
+  @Property
+  private String brokerUri;
 
   @Reference(name = "providerr")
   private Provider provider;
 
   public Broker() throws RemoteException {
     availableGenerators = new LinkedList<Generator>();
-    states = new LinkedList<Integer>();
   }
 
-  // @Reference
   public final void setProvider(Provider provider) {
     this.provider = provider;
   }
@@ -46,31 +47,28 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   @Override
   public void generatePoints(long points, int seed, int nodes, long blSize) throws RemoteException {
 
-    this.totalPoints = points;
-    //System.out.println("total points: " + totalPoints);
-    this.blockSize = blSize;
-    this.seed = seed;
-    int threads = (int) Math.ceil(points / (blockSize * nodes * 1.0));
-    System.out.println("threads: " + threads); 
-    regionSize = (1.0 / (nodes * threads * 1.0));
-    //System.out.println("region: " + regionSize);
-    min = 0.0;
-    max = regionSize;
+    totalPoints = points;
+    pointsInCircle = 0;
+    blockSize = blSize;
+
+    seedGenerator = new Random(seed);
+
+    int calls = (int) Math.ceil(points / (blockSize * nodes * 1.0));
+    System.out.println("calls: " + calls);
+
+    state = WORKING;
 
     for (int i = 0; i < nodes; i++) {
       Generator gen = provider.getGenerator();
-      gen.setBrokerNotifier(this);
-      callGenerator(gen, blockSize);
-      min = max;
-      max += regionSize;
-      //System.out.println("max: " + max);
+      //gen.setBrokerNotifier(this);
+      callGenerator(gen, blockSize, seedGenerator.nextInt());
     }
 
   }
 
-  public void callGenerator(Generator generator, long points) {
-   
-    Wrap w = new Wrap(generator, seed, points, min, max);
+  public void callGenerator(Generator generator, long points, int genSeed) {
+
+    Wrap w = new Wrap(generator, genSeed, points);
     new Thread(w).start();
 
   }
@@ -87,33 +85,36 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   }
 
   @Override
-  public synchronized void notify(Generator generator) throws RemoteException {
-    if (totalPoints > 0) { // macheteeeee XD
-
-      //System.out.println(generator.getUri());
+  public void notify(Generator generator) throws RemoteException {   
+    if (totalPoints > 0) {
       try {
         semaphore.acquire();
         totalPoints -= generator.getTotalPoints();
-        //System.out.println(totalPoints);
         pointsInCircle += generator.getPointsInCircle();
-        
-        //System.out.println(pointsInCircle);
-        //System.out.println("max: " + max);
+      
         if (totalPoints > 0) {
-          callGenerator(generator, this.blockSize);
-          min = max;
-          max += regionSize;
-          
+          callGenerator(generator, blockSize, seedGenerator.nextInt());
+        
         } else {
-          cNotifier.notifyClient(this.pointsInCircle);
+          cNotifier.notifyClient(pointsInCircle);
+          state = FREE;
         }
         semaphore.release();
       } catch (Exception e) {
         e.printStackTrace();
-        System.out.println("Errorrrrrrr");
+        System.out.println("Error while notifying");
       }
-      
-      //System.out.println();
+
     }
   }
+
+  public String getBrokerUri(){
+    return this.brokerUri;
+  }
+
+  @Override
+  public int getState() throws RemoteException {
+    return state;
+  }
+
 }
