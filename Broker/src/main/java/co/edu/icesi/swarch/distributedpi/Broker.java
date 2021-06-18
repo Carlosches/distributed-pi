@@ -24,7 +24,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
   private LinkedList<Integer> states;
 
   @Reference(name = "providerr")
-  private Provider provider;
+  private static Provider provider;
 
   public Broker() throws RemoteException {
     availableGenerators = new LinkedList<Generator>();
@@ -49,20 +49,20 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
     int threads = (int) Math.ceil(points/ (blockSize*nodes*1.0));
     
     long totalPoints=0;
-    double regionSize = (1.0/(nodes*threads*1.0));
+    
    
     ArrayList<Wrap> wraps = new ArrayList<Wrap>();
     ExecutorService executor = Executors.newFixedThreadPool(threads);
 
-    double min = 0.0;
-    double max = regionSize;
+    Random r = new Random(seed);
 
     while(threads-->0){
       
       for(int i=0;i<nodes;i++){
-        Generator gen = availableGenerators.poll();
+        //Generator gen = availableGenerators.poll();
+        Generator gen = provider.getGenerator();
         availableGenerators.add(gen);
-        Wrap w = new Wrap(gen, points, seed, blockSize, min,max);
+        Wrap w = new Wrap(gen, r.nextInt(), blockSize);
         try {
           semaphore.acquire();
           wraps.add(w);
@@ -72,8 +72,7 @@ public class Broker extends UnicastRemoteObject implements Client_Broker_Service
         }
         
         executor.execute(w);
-        min=max;
-        max+=regionSize;
+       
       }
       
     }
