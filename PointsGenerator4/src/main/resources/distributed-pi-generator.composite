@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0"
+  xmlns:frascati="http://frascati.ow2.org/xmlns/sca/1.1"
+  targetNamespace="http://frascati.ow2.org/distributed-pi"
+  name="generator">
+
+  <service name="r" promote="pointsGenerator/r">
+    <interface.java interface="java.lang.Runnable" />
+  </service>
+
+  <component name="pointsGenerator">
+
+    <property name="myUri">rmi://localhost:2005/server_generatorService</property>
+
+    <service name="r">
+      <interface.java interface="java.lang.Runnable" />
+    </service>
+
+    <service name="server_generator">
+      <frascati:binding.rmi host="localhost" serviceName="server_generatorService" port="2005"/>
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Generator" />
+    </service>
+
+    <reference name="attacher">
+      <interface.java interface="main.java.co.edu.icesi.swarch.distributedpi.Attacher" />
+      <frascati:binding.rmi host="localhost" serviceName="attachService" port="2003"/>
+    </reference>
+    
+    <implementation.java class="main.java.co.edu.icesi.swarch.distributedpi.GeneratorImpl" />
+
+  </component>
+
+</composite>

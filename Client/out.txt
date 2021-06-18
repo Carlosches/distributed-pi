@@ -1,0 +1,29 @@
+Scenario name: scenario
+Points sent to generate : 10000
+Points in circle : 78910
+Pi calculated : 31.564
+Execution time (seconds): 0
+Scenario name: scenario
+Points sent to generate : 1000000
+Points in circle : 786103
+Pi calculated : 3.144412
+Execution time (seconds): 0
+Scenario name: Scenario 3
+Points sent to generate : 1000000
+Points in circle : 786103
+Pi calculated : 3.144412
+Execution time (seconds): 0
+Scenario name: Scenario 3
+Points sent to generate : 1000000
+Points in circle : 786103
+Pi calculated : 3.144412
+Execution time (seconds): 0
+=======================================================
+
+Scenario name: Scenario3
+Points sent to generate : 1000000
+Points in circle : 786103
+Pi calculated : 3.144412
+Execution time (seconds): 0
+=======================================================
+
